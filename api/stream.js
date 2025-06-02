@@ -20,19 +20,12 @@ export default async function handler(req, res) {
     // Replace channel id placeholder with requested id
     const replacedUrl = baseUrl.replace("StarSports_2_Hin_HD_voot_MOB", id);
 
-    // Option 1: Return replaced URL only
-    return res.status(200).json({ url: replacedUrl });
-
-    // Option 2: Fetch content from replaced URL and return content
-    // const response = await fetch(replacedUrl);
-    // if (!response.ok) {
-    //   return res.status(response.status).json({ error: `Failed to fetch stream: ${response.statusText}` });
-    // }
-    // const body = await response.text();
-    // res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    // return res.status(200).send(body);
+    // Return only the replaced URL as plain text
+    res.setHeader("Content-Type", "text/plain");
+    return res.status(200).send(replacedUrl);
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 }
+
