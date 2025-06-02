@@ -4,35 +4,37 @@ import path from "path";
 export default async function handler(req, res) {
   const { id } = req.query;
   if (!id) {
-    return res.status(400).json({ error: "Missing 'id' query parameter" });
+    return res.status(400).send("Missing 'id' query parameter");
   }
 
   try {
-    // Read get.txt file content
+    // Read get.txt file content (your base URL with token & StarSports_2_Hin_HD_voot_MOB placeholder)
     const filePath = path.resolve("./get.txt");
     let baseUrl = await fs.readFile(filePath, "utf8");
     baseUrl = baseUrl.trim();
 
     if (!baseUrl) {
-      return res.status(500).json({ error: "Base URL not found in get.txt" });
+      return res.status(500).send("Base URL not found in get.txt");
     }
 
-    // Replace channel id placeholder with requested id
-    const replacedUrl = baseUrl.replace("StarSports_2_Hin_HD_voot_MOB", id);
+    // Replace channel ID placeholder with requested id
+    const streamUrl = baseUrl.replace("StarSports_2_Hin_HD_voot_MOB", id);
 
-    // Option 1: Return replaced URL only
-    return res.status(200).json({ url: replacedUrl });
+    // Fetch the actual M3U8 playlist content from the replaced URL
+    const fetchResponse = await fetch(streamUrl);
 
-    // Option 2: Fetch content from replaced URL and return content
-    // const response = await fetch(replacedUrl);
-    // if (!response.ok) {
-    //   return res.status(response.status).json({ error: `Failed to fetch stream: ${response.statusText}` });
-    // }
-    // const body = await response.text();
-    // res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-    // return res.status(200).send(body);
+    if (!fetchResponse.ok) {
+      return res.status(fetchResponse.status).send(`Failed to fetch stream: ${fetchResponse.statusText}`);
+    }
 
+    // Get playlist text content
+    const playlistContent = await fetchResponse.text();
+
+    // Return the playlist with correct content-type header for HLS streaming
+    res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    return res.status(200).send(playlistContent);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).send(`Error: ${error.message}`);
   }
 }
