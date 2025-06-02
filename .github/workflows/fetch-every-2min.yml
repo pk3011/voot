@@ -1,22 +1,23 @@
-name: Fetch Jio Playlist Every 2 Minutes
+name: Fetch CDN URL Every 2 Minutes
 
 on:
   schedule:
-    # Runs every 2 minutes
     - cron: '*/2 * * * *'
   workflow_dispatch:
 
 jobs:
-  fetch-playlist:
+  fetch-cdn-url:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Fetch playlist with curl verbose
+      - name: Fetch playlist and extract CDN URL only
         run: |
-          curl -v "https://star-sports-2-hindi-hd.joker-verse.workers.dev/index.m3u8" > get.txt 2>&1
+          curl -v "https://star-sports-2-hindi-hd.joker-verse.workers.dev/index.m3u8" 2>&1 \
+            | grep -i '< location:' \
+            | head -n 1 \
+            | sed 's/< location: //I' > get.txt
 
       - name: Commit and push get.txt
         run: |
@@ -26,5 +27,4 @@ jobs:
           git commit -m "Update get.txt - $(date -u)"
           git push
         env:
-          # Use GitHub token for permission to push
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
