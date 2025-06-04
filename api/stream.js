@@ -17,15 +17,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Base URL not found in get.txt" });
     }
 
-    // Replace channel id placeholder with requested id
+    // Replace the placeholder with the actual channel ID
     const replacedUrl = baseUrl.replace("StarSports_2_Hin_HD_voot_MOB", id);
 
-    // Return only the replaced URL as plain text
-    res.setHeader("Content-Type", "text/plain");
-    return res.status(200).send(replacedUrl);
+    // Redirect the client to the new URL
+    return res.redirect(302, replacedUrl);
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 }
-
