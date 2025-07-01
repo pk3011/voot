@@ -12,6 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
       - name: Fetch __hdnea__ token from redirect URL
         run: |
           curl -v "https://star-sports-2-hindi-hd.joker-verse.workers.dev/index.m3u8" 2>&1 \
@@ -20,11 +25,15 @@ jobs:
           | sed 's/< location: //I' \
           | grep -o '__hdnea__=[^&]*' > fetch.txt
 
-      - name: Commit and push fetch.txt
+      - name: Run Python Script to update channels.json
+        run: python append_hdnea_token.py
+
+      - name: Commit and push updates
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add fetch.txt
-          git diff --cached --quiet || git commit -m "Update fetch.txt - $(date -u)" && git push
+          git add fetch.txt channels.json
+          git diff --cached --quiet || git commit -m "Update fetch.txt and channels.json - $(date -u)" && git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
