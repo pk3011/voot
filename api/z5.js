@@ -35,11 +35,17 @@ async function fetchAndParseM3U() {
 }
 
 export default async function handler(req, res) {
+  const groupFilter = req.query.group;
   const channels = await fetchAndParseM3U();
   const host = `https://${req.headers.host}`;
   const m3u = ['#EXTM3U'];
 
-  for (const c of channels) {
+  // Filter channels by group if provided
+  const filtered = groupFilter
+    ? channels.filter(c => c.group.toLowerCase() === groupFilter.toLowerCase())
+    : channels;
+
+  for (const c of filtered) {
     m3u.push(
       `#EXTINF:-1 tvg-id="${c.id}" group-title="${c.group}" tvg-logo="${c.logo}",${c.name}`,
       `#EXTVLCOPT:http-user-agent=${c.ua}`,
