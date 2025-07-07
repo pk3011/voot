@@ -35,40 +35,18 @@ async function fetchAndParseM3U() {
 }
 
 export default async function handler(req, res) {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const pathname = url.pathname;
-  const searchParams = url.searchParams;
   const channels = await fetchAndParseM3U();
+  const host = `https://${req.headers.host}`;
+  const m3u = ['#EXTM3U'];
 
-  if (pathname === '/api/play') {
-    const id = searchParams.get('id');
-    const channel = channels.find(c => c.id === id);
-
-    if (channel) {
-      res.writeHead(302, { Location: channel.url });
-      res.end();
-    } else {
-      res.status(404).send('Channel not found');
-    }
-    return;
+  for (const c of channels) {
+    m3u.push(
+      `#EXTINF:-1 tvg-id="${c.id}" group-title="${c.group}" tvg-logo="${c.logo}",${c.name}`,
+      `#EXTVLCOPT:http-user-agent=${c.ua}`,
+      `${host}/api/play?id=${c.id}`
+    );
   }
 
-  if (pathname === '/api/playlist') {
-    const host = `https://${req.headers.host}`;
-    const m3u = ['#EXTM3U'];
-
-    for (const c of channels) {
-      m3u.push(
-        `#EXTINF:-1 tvg-id="${c.id}" group-title="${c.group}" tvg-logo="${c.logo}",${c.name}`,
-        `#EXTVLCOPT:http-user-agent=${c.ua}`,
-        `${host}/api/play?id=${c.id}`
-      );
-    }
-
-    res.setHeader('Content-Type', 'text/plain');
-    res.send(m3u.join('\n'));
-    return;
-  }
-
-  res.status(404).send('Not Found');
+  res.setHeader('Content-Type', 'text/plain');
+  res.send(m3u.join('\n'));
 }
