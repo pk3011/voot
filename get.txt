@@ -1,1 +1,1 @@
-https://jiotvmblive.cdn.jio.com/bpk-tv/StarSports_2_Hin_HD_voot_MOB/output03/index.m3u8?__hdnea__=st=1751881806~exp=1751968206~acl=/*~hmac=c2db857b2b4e138b1cae92731ce48ad4e9e3514903f5b293737651d2634edd7bfe65ddbf2be24102a50e17239eed2bec
+https://jiotvmblive.cdn.jio.com/bpk-tv/StarSports_2_Hin_HD_voot_MOB/output03/index.m3u8?__hdnea__=acl=/*~hmac=c194f061e5e64211e505157a70b3ed1c8f5d380562b91fa1005845beadd07233
