@@ -39,4 +39,4 @@ jobs:
           git push
 
         env:
-          TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
