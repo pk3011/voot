@@ -24,9 +24,18 @@ jobs:
 
       - name: Fetch __hdnea__ token from cookies.json
         run: |
-          curl -s "https://fftv.in/jpls/cookies.json" \
-          | grep -o '"__hdnea__":"[^"]*"' \
-          | sed 's/.*"__hdnea__":"\([^"]*\)".*/__hdnea__=\1/' > fetch.txt
+          echo "Fetching token from https://fftv.in/jpls/cookies.json"
+          response=$(curl -s "https://fftv.in/jpls/cookies.json")
+          echo "Response: $response"
+
+          token=$(echo "$response" | grep -o '"__hdnea__":"[^"]*"' | sed 's/.*"__hdnea__":"\([^"]*\)".*/\1/')
+          if [ -z "$token" ]; then
+            echo "::error ::Failed to extract __hdnea__ token"
+            exit 1
+          fi
+
+          echo "__hdnea__=$token" > fetch.txt
+          echo "Token saved to fetch.txt"
 
       - name: Run Python Script to update channels.json
         run: python append_hdnea_token.py
@@ -39,4 +48,4 @@ jobs:
           git diff --cached --quiet || git commit -m "Update fetch.txt and channels.json - $(date -u)"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
