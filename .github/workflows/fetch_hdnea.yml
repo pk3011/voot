@@ -1,8 +1,11 @@
-name: Fetch HDNEA Token Every 2 Minutes
+name: Fetch HDNEA Token at Scheduled Times
 
 on:
   schedule:
-    - cron: '*/2 * * * *'
+    - cron: '0 1 * * *'   # 7am IST
+    - cron: '0 2 * * *'   # 8am IST
+    - cron: '0 11 * * *'  # 5pm IST
+    - cron: '0 12 * * *'  # 6pm IST
   workflow_dispatch:
 
 jobs:
@@ -17,13 +20,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Fetch __hdnea__ token from redirect URL
+      - name: Fetch __hdnea__ token from cookies.json
         run: |
-          curl -v "https://star-sports-2-hindi-hd.joker-verse.workers.dev/index.m3u8" 2>&1 \
-          | grep -i '< location:' \
-          | head -n 1 \
-          | sed 's/< location: //I' \
-          | grep -o '__hdnea__=[^&]*' > fetch.txt
+          curl -s "https://fftv.in/jpls/cookies.json" \
+          | grep -o '"__hdnea__":"[^"]*"' \
+          | sed 's/.*"__hdnea__":"\([^"]*\)".*/__hdnea__=\1/' > fetch.txt
 
       - name: Run Python Script to update channels.json
         run: python append_hdnea_token.py
@@ -36,4 +37,3 @@ jobs:
           git diff --cached --quiet || git commit -m "Update fetch.txt and channels.json - $(date -u)" && git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
