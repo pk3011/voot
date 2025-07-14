@@ -36,4 +36,4 @@ jobs:
           git add fetch.txt channels.json
           git diff --cached --quiet || git commit -m "Update fetch.txt and channels.json - $(date -u)" && git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
