@@ -25,10 +25,13 @@ jobs:
       - name: Fetch __hdnea__ token from cookies.json
         run: |
           echo "Fetching token from https://fftv.in/jpls/cookies.json"
+
           response=$(curl -s "https://fftv.in/jpls/cookies.json")
           echo "Response: $response"
 
-          token=$(echo "$response" | grep -o '"__hdnea__":"[^"]*"' | sed 's/.*"__hdnea__":"\([^"]*\)".*/\1/')
+          # Extract token from 'cookie' field
+          token=$(echo "$response" | grep -o '"cookie":"__hdnea__=[^"]*"' | sed 's/.*"cookie":"__hdnea__=\([^"]*\)".*/\1/')
+
           if [ -z "$token" ]; then
             echo "::error ::Failed to extract __hdnea__ token"
             exit 1
