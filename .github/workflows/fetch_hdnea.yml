@@ -29,10 +29,10 @@ jobs:
           response=$(curl -s "https://fftv.in/jpls/cookies.json")
           echo "Response: $response"
 
-          # Extract token from 'cookie' field
-          token=$(echo "$response" | grep -o '"cookie":"__hdnea__=[^"]*"' | sed 's/.*"cookie":"__hdnea__=\([^"]*\)".*/\1/')
+          # Use jq to extract the cookie and remove __hdnea__= prefix
+          token=$(echo "$response" | jq -r '.[0].cookie' | sed 's/^__hdnea__=//')
 
-          if [ -z "$token" ]; then
+          if [ -z "$token" ] || [[ "$token" == "null" ]]; then
             echo "::error ::Failed to extract __hdnea__ token"
             exit 1
           fi
