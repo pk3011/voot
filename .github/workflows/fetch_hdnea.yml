@@ -2,8 +2,10 @@ name: Fetch HDNEA Token at Scheduled Times
 
 on:
   schedule:
-    - cron: '0 2 * * *' #8am IST
-    - cron: '0 12 * * *'  # 6pm IST
+    # 4:00 AM IST ≈ 22:30 UTC → nearest 23:00 UTC (3:30 AM IST)
+    - cron: '0 23 * * *'
+    # 8:00 AM IST ≈ 02:30 UTC → nearest 3:00 UTC (8:30 AM IST)
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:
@@ -26,7 +28,6 @@ jobs:
           response=$(curl -s "https://fftv.in/jpls/cookies.json")
           echo "Response: $response"
 
-          # Use jq to extract the cookie and remove __hdnea__= prefix
           token=$(echo "$response" | jq -r '.[0].cookie' | sed 's/^__hdnea__=//')
 
           if [ -z "$token" ] || [[ "$token" == "null" ]]; then
