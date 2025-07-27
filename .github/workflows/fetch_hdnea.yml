@@ -2,10 +2,10 @@ name: Fetch HDNEA Token at Scheduled Times
 
 on:
   schedule:
-    # 4:00 AM IST ≈ 22:30 UTC → nearest 23:00 UTC (3:30 AM IST)
-    - cron: '0 0 * * *'
-    # 8:00 AM IST ≈ 02:30 UTC → nearest 3:00 UTC (8:30 AM IST)
-    - cron: '0 3 * * *'
+    # 5:00 AM IST = 23:30 UTC (previous day)
+    - cron: '30 23 * * *'
+    # 8:00 AM IST = 02:30 UTC (same day)
+    - cron: '30 2 * * *'
   workflow_dispatch:
 
 jobs:
